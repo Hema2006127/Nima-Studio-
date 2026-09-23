@@ -34,7 +34,7 @@ Next.js 16 (App Router) + Supabase (Postgres, Auth, Storage). Bilingual (English
 
 ## Deploying
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) (Vercel + custom domain + Supabase auth/SMTP settings).
+See [DEPLOYMENT.md](DEPLOYMENT.md) (Netlify + custom domain + Supabase auth/SMTP settings). Netlify config lives in `netlify.toml`.
 
 ## Adding a film
 
@@ -46,7 +46,7 @@ Upload the video to YouTube, then go to **/admin/portfolio → Add YouTube film*
 - Admin pages call `requireAdmin()`, admin server actions call `assertAdmin()`, and RLS enforces the same rule in the database.
 - Customers create bookings only through the `submit_booking()` RPC. It requires a verified email and ignores protected fields such as status. They can cancel only through `cancel_booking()`, and they can read only their own bookings, sent quotations and payments.
 - The service-role key is not used anywhere.
-- Storage bucket `portfolio`: public read via URL, admin-only writes, images only (JPG/PNG/WebP/AVIF), 5 MB max. The server also checks each file's magic bytes.
+- Storage bucket `portfolio`: public read via URL, admin-only writes, images only (JPG/PNG/WebP/AVIF), 4 MB max in the app (5 MB bucket limit). The server also checks each file's magic bytes.
 
 ## Tests
 

@@ -124,7 +124,7 @@ export function PortfolioForm({ item, coverUrl }: { item?: PortfolioItem; coverU
               setPreview(f ? URL.createObjectURL(f) : null);
             }}
           />
-          <p className="mt-1 text-xs text-ink-soft">JPG, PNG, WebP or AVIF · max 5 MB. Videos are never uploaded here — they live on YouTube.</p>
+          <p className="mt-1 text-xs text-ink-soft">JPG, PNG, WebP or AVIF · max 4 MB. Videos are never uploaded here — they live on YouTube.</p>
           <FieldError state={state} name="cover" />
           {item?.cover_image_path && (
             <label className="mt-2 flex items-center gap-2 text-sm">

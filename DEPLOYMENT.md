@@ -1,33 +1,48 @@
-# نشر الموقع على الدومين
+# نشر الموقع على الدومين (Netlify)
 
-الطريقة المقترحة: **Vercel** (مجاني، ومصمم لـ Next.js) + ربط الدومين بتاعك.
+الموقع جاهز للنشر على **Netlify**. Netlify بيتعرف على Next.js أوتوماتيك، والإعدادات موجودة في `netlify.toml`.
 > الاستضافة العادية (Shared hosting / cPanel من غير Node.js) **مش هتشغّل الموقع**، لأنه محتاج سيرفر Node.js.
 
 ---
 
-## 1) رفع الموقع على Vercel
+## 1) رفع الموقع على Netlify
 
-1. ادخل [vercel.com](https://vercel.com) وسجّل بحساب GitHub.
-2. **Add New → Project** واختار الريبو `Nima-Studio-` ودوس **Import**.
-3. قبل ما تدوس Deploy، افتح **Environment Variables** وضيف التلاتة دول:
+1. ادخل [app.netlify.com](https://app.netlify.com) وسجّل بحساب GitHub.
+2. **Add new project → Import an existing project → GitHub**، واختار الريبو `Nima-Studio-`.
+   (لو الريبو مش ظاهر، دوس **Configure Netlify on GitHub** واديله صلاحية على الريبو.)
+3. في صفحة الإعدادات:
+   - **Branch to deploy**: `main`
+   - **Build command** و **Publish directory**: سيبهم زي ما Netlify يحددهم (بياخدهم من `netlify.toml`).
+4. قبل ما تدوس Deploy، دوس **Add environment variables** وضيف التلاتة دول:
 
-   | Name | Value |
+   | Key | Value |
    |---|---|
    | `NEXT_PUBLIC_SUPABASE_URL` | `https://ucrhawxncltovtfuilue.supabase.co` |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | الـ publishable key (`sb_publishable_...`) |
    | `NEXT_PUBLIC_SITE_URL` | `https://your-domain.com` ← الدومين بتاعك بالظبط |
 
    ⚠️ متضيفش الـ secret key أبداً.
-4. دوس **Deploy**، وبعد دقيقتين هيديك لينك تجريبي زي `nima-studio.vercel.app`.
+   (لو نسيتهم: **Site configuration → Environment variables**، وبعدها **Deploys → Trigger deploy → Deploy site**.)
+5. دوس **Deploy**. بعد 2–4 دقايق هيديك لينك تجريبي زي `nima-studio.netlify.app`. جرّب عليه الموقع قبل ما تربط الدومين.
 
 ## 2) ربط الدومين
 
-1. في المشروع على Vercel: **Settings → Domains** واكتب الدومين (مثلاً `nimastudio.com`) ودوس **Add**. ضيف كمان `www.nimastudio.com`.
-2. Vercel هيوريك سجلات DNS المطلوبة. ادخل لوحة التحكم بتاعة الشركة اللي اشتريت منها الدومين (GoDaddy / Namecheap / Hostinger …) وفي **DNS** ضيف اللي Vercel طالبه، وغالباً بيبقى:
-   - `A` record → Host: `@` → Value: القيمة اللي Vercel بيديهالك (عادة `76.76.21.21`)
-   - `CNAME` record → Host: `www` → Value: `cname.vercel-dns.com`
-3. استنى من دقايق لكام ساعة لحد ما الـ DNS يشتغل. شهادة HTTPS بتتعمل أوتوماتيك.
-4. لو غيّرت `NEXT_PUBLIC_SITE_URL` بعد أول Deploy، اعمل **Redeploy** من تبويب Deployments.
+1. في المشروع على Netlify: **Domain management → Add a domain**، واكتب الدومين (مثلاً `nimastudio.com`) ودوس **Verify** ثم **Add domain**. Netlify بيضيف `www` معاه أوتوماتيك.
+2. عندك طريقتين:
+
+   **أ) الأسهل — Netlify DNS:** Netlify هيديك 4 **Nameservers** (زي `dns1.p01.nsone.net`). ادخل لوحة الشركة اللي اشتريت منها الدومين (GoDaddy / Namecheap / Hostinger …) وغيّر الـ Nameservers للأربعة دول.
+
+   **ب) تفضل على DNS الشركة بتاعتك:** ضيف السجلين دول في إعدادات DNS:
+   | Type | Host | Value |
+   |---|---|---|
+   | `A` | `@` | `75.2.60.5` |
+   | `CNAME` | `www` | `your-site.netlify.app` ← اللينك التجريبي بتاعك من غير https |
+
+   (لو الشركة بتدعم `ALIAS` أو `ANAME`، استخدمه بدل الـ A record وخلّي قيمته `apex-loadbalancer.netlify.com`.)
+3. استنى لحد ما الـ DNS يشتغل (من دقايق لـ 24 ساعة). بعدها Netlify بيعمل شهادة **HTTPS** أوتوماتيك، ولو متعملتش افتح **Domain management → HTTPS → Verify DNS configuration**.
+4. لو غيّرت `NEXT_PUBLIC_SITE_URL` بعد أول نشر، اعمل **Trigger deploy** عشان التغيير يتطبق.
+
+> **صور الغلاف:** أقصى حجم 4 MB (حد Netlify لرفع الملفات). صغّر الصور قبل الرفع لو أكبر، مثلاً بـ [squoosh.app](https://squoosh.app).
 
 ## 3) إعدادات Supabase للدومين (مهمة جداً)
 
@@ -58,5 +73,5 @@
 
 ## التحديثات بعد كده
 
-أي تعديل يترفع على GitHub (`main`) بيتنشر على الموقع أوتوماتيك خلال دقيقتين.
+أي تعديل يترفع على GitHub (`main`) بيتنشر على Netlify أوتوماتيك خلال دقايق.
 لو فيه تعديل على قاعدة البيانات (ملف جديد في `supabase/migrations`) لازم يتشغّل في Supabase SQL Editor الأول.

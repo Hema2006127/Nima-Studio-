@@ -1,6 +1,6 @@
 import 'server-only';
 
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
 const TYPES = {
   'image/jpeg': 'jpg',
@@ -28,7 +28,7 @@ export async function validateImage(
   file: File,
 ): Promise<{ ok: true; contentType: ImageType; ext: string; body: ArrayBuffer } | { ok: false; error: string }> {
   if (file.size === 0) return { ok: false, error: 'The file is empty.' };
-  if (file.size > MAX_IMAGE_BYTES) return { ok: false, error: 'Images must be 5 MB or smaller.' };
+  if (file.size > MAX_IMAGE_BYTES) return { ok: false, error: 'Images must be 4 MB or smaller.' };
   if (!(file.type in TYPES)) return { ok: false, error: 'Only JPG, PNG, WebP or AVIF images are allowed.' };
 
   const body = await file.arrayBuffer();
