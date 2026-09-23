@@ -12,6 +12,15 @@ const PROTECTED_PREFIXES = ['/account', '/admin'];
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  // Missing env vars must not take down every route (robots.txt, static pages…).
+  // Pages that need Supabase still fail and log the same message.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.error(
+      'Supabase env vars are missing: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your hosting settings, then redeploy.',
+    );
+    return response;
+  }
+
   const supabase = createServerClient(supabaseUrl(), supabaseAnonKey(), {
     cookies: {
       getAll() {
