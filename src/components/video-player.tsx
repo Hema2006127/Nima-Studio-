@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { PlayIcon } from './icons';
 import { isValidVideo, videoEmbedUrl, videoThumbnailUrl, type VideoProvider } from '@/lib/video';
 
@@ -36,17 +36,21 @@ export function VideoPlayer({ provider = 'youtube', videoId, title, coverUrl, la
   const driveInline = provider === 'drive' && !coverUrl;
 
   if (valid && (playing || driveInline)) {
+    const iframeProps = {
+      src: videoEmbedUrl(video, { autoplay: true }),
+      title,
+      loading: driveInline ? ('lazy' as const) : undefined,
+      allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+      referrerPolicy: 'strict-origin-when-cross-origin' as const,
+      allowFullScreen: true,
+    };
     return (
       <div className={`relative w-full overflow-hidden bg-black ${aspect} ${className}`}>
-        <iframe
-          src={videoEmbedUrl(video, { autoplay: true })}
-          title={title}
-          loading={driveInline ? 'lazy' : undefined}
-          className="absolute inset-0 h-full w-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
+        {provider === 'drive' ? (
+          <ScaledFrame {...iframeProps} />
+        ) : (
+          <iframe {...iframeProps} className="absolute inset-0 h-full w-full" />
+        )}
       </div>
     );
   }
@@ -80,5 +84,40 @@ export function VideoPlayer({ provider = 'youtube', videoId, title, coverUrl, la
       </span>
       {label && <span className="absolute bottom-3 end-3 bg-black/55 px-1.5 py-0.5 text-[11px] text-white">{label}</span>}
     </button>
+  );
+}
+
+/** Drive's player needs ~420px of width; narrower frames clip its controls. */
+const DRIVE_MIN_WIDTH = 420;
+
+/**
+ * Renders the iframe at least DRIVE_MIN_WIDTH wide and scales it down to fit the
+ * frame, so Drive's controls keep their layout on narrow phone screens.
+ */
+function ScaledFrame(props: React.IframeHTMLAttributes<HTMLIFrameElement>) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState<{ w: number; h: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => setBox({ w: el.clientWidth, h: el.clientHeight });
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const scale = box && box.w < DRIVE_MIN_WIDTH ? box.w / DRIVE_MIN_WIDTH : 1;
+  return (
+    <div ref={ref} className="absolute inset-0" dir="ltr">
+      {box && (
+        <iframe
+          {...props}
+          className="absolute left-0 top-0 origin-top-left"
+          style={{ width: box.w / scale, height: box.h / scale, transform: scale === 1 ? undefined : `scale(${scale})` }}
+        />
+      )}
+    </div>
   );
 }
