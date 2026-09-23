@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from './logo';
 import { getDictionary } from '@/lib/i18n/server';
 import { getSiteSettings } from '@/lib/data';
 import { getUser, isAdmin } from '@/lib/auth';
@@ -24,9 +25,7 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur">
       <div className="container-x flex h-16 items-center justify-between gap-6">
-        <Link href="/" className="font-display text-2xl text-ink">
-          {studioName}
-        </Link>
+        <Logo name={studioName} />
 
         <NavLinks links={links} className="hidden items-center gap-8 lg:flex" />
 

@@ -17,7 +17,7 @@ export default async function PortfolioPage({ searchParams }: PageProps<'/portfo
 
   const filters: Array<{ key?: PortfolioCategory; label: string }> = [
     { label: t.categories.all },
-    ...PORTFOLIO_CATEGORIES.filter((c) => c !== 'other').map((c) => ({ key: c, label: t.categories[c] })),
+    ...PORTFOLIO_CATEGORIES.map((c) => ({ key: c, label: t.categories[c] })),
   ];
 
   return (

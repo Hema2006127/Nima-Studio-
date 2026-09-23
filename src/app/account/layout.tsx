@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Logo } from '@/components/logo';
 import { requireUser } from '@/lib/auth';
 import { getDictionary } from '@/lib/i18n/server';
 import { getSiteSettings } from '@/lib/data';
@@ -22,9 +22,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
     <div className="min-h-screen lg:grid lg:grid-cols-[250px_1fr]">
       <aside className="flex flex-col border-b border-line p-5 lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-e">
         <div className="flex flex-wrap items-center justify-between gap-3 lg:flex-col lg:items-start">
-          <Link href="/" className="font-display text-2xl leading-tight">
-            {settings ? localized(settings, 'studio_name', locale) : ''}
-          </Link>
+          <Logo name={settings ? localized(settings, 'studio_name', locale) : ''} />
           <div className="flex items-center gap-3">
             <LocaleToggle locale={locale} />
             <ThemeToggle label={t.nav.toggleTheme} />

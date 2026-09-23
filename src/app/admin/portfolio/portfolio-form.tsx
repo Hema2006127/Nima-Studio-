@@ -8,11 +8,8 @@ import { parseYouTubeId, youTubeWatchUrl } from '@/lib/youtube';
 import { PORTFOLIO_CATEGORIES, type PortfolioItem } from '@/lib/types';
 
 const CATEGORY_LABELS: Record<string, string> = {
-  wedding: 'Wedding',
-  engagement: 'Engagement',
-  session: 'Session',
+  promo: 'Promo',
   reel: 'Reel',
-  other: 'Other',
 };
 
 export function PortfolioForm({ item, coverUrl }: { item?: PortfolioItem; coverUrl?: string | null }) {
@@ -85,7 +82,7 @@ export function PortfolioForm({ item, coverUrl }: { item?: PortfolioItem; coverU
             <label htmlFor="category" className="label">
               Category
             </label>
-            <select id="category" name="category" defaultValue={item?.category ?? 'wedding'} className="input">
+            <select id="category" name="category" defaultValue={item?.category ?? 'promo'} className="input">
               {PORTFOLIO_CATEGORIES.map((c) => (
                 <option key={c} value={c}>
                   {CATEGORY_LABELS[c]}

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from './logo';
 import { getDictionary } from '@/lib/i18n/server';
 import { getSiteSettings } from '@/lib/data';
 import { localized } from '@/lib/utils';
@@ -11,7 +12,7 @@ export async function SiteFooter() {
     <footer className="border-t border-line">
       <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-display text-2xl">{name}</p>
+          <Logo name={name} size={48} />
           {settings && (
             <>
               <p className="mt-3 text-sm text-ink-soft">{localized(settings, 'tagline', locale)}</p>

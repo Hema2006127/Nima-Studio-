@@ -40,11 +40,8 @@ const en = {
   },
   categories: {
     all: 'All',
-    wedding: 'Weddings',
-    engagement: 'Engagements',
-    session: 'Sessions',
+    promo: 'Promo',
     reel: 'Reels',
-    other: 'Other',
   },
   eventTypes: {
     wedding: 'Wedding',
@@ -249,11 +246,8 @@ const ar: Dictionary = {
   },
   categories: {
     all: 'الكل',
-    wedding: 'أفراح',
-    engagement: 'خطوبة',
-    session: 'سيشن',
+    promo: 'برومو',
     reel: 'ريلز',
-    other: 'أخرى',
   },
   eventTypes: {
     wedding: 'فرح',

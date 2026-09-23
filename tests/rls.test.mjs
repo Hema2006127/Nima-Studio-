@@ -1,11 +1,11 @@
 // Runs the real migration against PGlite with a minimal Supabase auth/storage stub,
 // then exercises RLS as anon / customer / other customer / unverified / admin.
 import { PGlite } from '@electric-sql/pglite';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../supabase', import.meta.url));
-const migration = readFileSync(`${root}/migrations/20260923000000_initial_schema.sql`, 'utf8');
+const migrations = readdirSync(`${root}/migrations`).filter((f) => f.endsWith('.sql')).sort();
 const seed = readFileSync(`${root}/seed.sql`, 'utf8');
 
 const db = new PGlite();
@@ -28,9 +28,28 @@ await db.exec(`
   alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 `);
 
-try { await db.exec(migration); } catch (e) { console.error("MIGRATION ERROR:", e.message, e.position); process.exit(1); }
+// Apply the first migration, seed a pre-change portfolio row, then apply the rest
+// so data migrations (e.g. category changes) are exercised on real rows.
+for (const [i, file] of migrations.entries()) {
+  try {
+    await db.exec(readFileSync(`${root}/migrations/${file}`, 'utf8'));
+  } catch (e) {
+    console.error(`MIGRATION ERROR in ${file}:`, e.message, e.position);
+    process.exit(1);
+  }
+  if (i === 0) {
+    await db.exec(`insert into public.portfolio_items (title, youtube_video_id, category) values
+      ('legacy-wedding', 'LEGACYwed01', 'wedding'), ('legacy-reel', 'LEGACYreel1', 'reel')`);
+  }
+}
 await db.exec(seed);
-console.log('✓ migration + seed applied');
+console.log(`✓ ${migrations.length} migrations + seed applied`);
+{
+  const cats = Object.fromEntries((await db.query(`select title, category::text c from public.portfolio_items where title like 'legacy-%'`)).rows.map((r) => [r.title, r.c]));
+  if (cats['legacy-wedding'] !== 'promo' || cats['legacy-reel'] !== 'reel') { console.error('✗ category migration', cats); process.exit(1); }
+  console.log('✓ legacy categories migrated (wedding→promo, reel→reel)');
+  await db.exec(`delete from public.portfolio_items where title like 'legacy-%'`);
+}
 
 const ADMIN = '00000000-0000-0000-0000-00000000000a';
 const CUST = '00000000-0000-0000-0000-00000000000c';

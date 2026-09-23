@@ -4,7 +4,6 @@ import { getLocale, getTheme } from '@/lib/i18n/server';
 import { getSiteSettings } from '@/lib/data';
 import { localized } from '@/lib/utils';
 import { siteUrl } from '@/lib/site-url';
-import { youTubeThumbnailUrl } from '@/lib/youtube';
 import './globals.css';
 
 const cormorant = Cormorant_Garamond({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-cormorant' });
@@ -18,8 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const tagline = settings ? localized(settings, 'tagline', locale) : '';
   const title = tagline ? `${name} — ${tagline}` : name;
   const description = settings ? localized(settings, 'hero_subtitle', locale) : undefined;
-  // Link previews (WhatsApp, Instagram, Facebook) use the showreel thumbnail.
-  const image = settings?.showreel_youtube_id ? youTubeThumbnailUrl(settings.showreel_youtube_id, 'hqdefault') : undefined;
+  // Link previews (WhatsApp, Instagram, Facebook) show the studio logo.
+  const image = '/og.jpg';
   return {
     metadataBase: new URL(siteUrl()),
     title: { default: title, template: `%s · ${name}` },
@@ -30,9 +29,9 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       locale: locale === 'ar' ? 'ar_EG' : 'en_US',
-      images: image ? [{ url: image }] : undefined,
+      images: [{ url: image, width: 1200, height: 630 }],
     },
-    twitter: { card: 'summary_large_image', title, description, images: image ? [image] : undefined },
+    twitter: { card: 'summary_large_image', title, description, images: [image] },
   };
 }
 

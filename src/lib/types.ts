@@ -1,7 +1,7 @@
 // Row types mirroring supabase/migrations. Regenerate with
 // `npx supabase gen types typescript` once the project is linked if you prefer generated types.
 
-export const PORTFOLIO_CATEGORIES = ['wedding', 'engagement', 'session', 'reel', 'other'] as const;
+export const PORTFOLIO_CATEGORIES = ['promo', 'reel'] as const;
 export type PortfolioCategory = (typeof PORTFOLIO_CATEGORIES)[number];
 
 export const EVENT_TYPES = ['wedding', 'engagement', 'session', 'reel', 'other'] as const;

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CloseIcon, MenuIcon } from './icons';
 
 type NavLink = { href: string; label: string };
@@ -66,8 +67,10 @@ export function MobileMenu({
       <button type="button" onClick={() => setOpen(true)} aria-label={menuLabel} aria-expanded={open} className="p-1 text-ink">
         <MenuIcon size={22} />
       </button>
-      {open && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-bg" role="dialog" aria-modal="true">
+      {/* Portal to <body>: the header's backdrop-blur would otherwise trap this fixed overlay inside it. */}
+      {open &&
+        createPortal(
+        <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-bg text-ink" role="dialog" aria-modal="true">
           <div className="container-x flex h-16 items-center justify-between border-b border-line">
             {themeToggle}
             <button type="button" onClick={() => setOpen(false)} aria-label={closeLabel} className="p-1 text-ink">
@@ -79,7 +82,8 @@ export function MobileMenu({
               <Link
                 key={l.href}
                 href={l.href}
-                className={`border-b border-line py-4 font-display text-2xl ${isActive(pathname, l.href) ? 'text-ink' : 'text-ink-soft'}`}
+                aria-current={isActive(pathname, l.href) ? 'page' : undefined}
+                className={`border-b border-line py-4 font-display text-3xl ${isActive(pathname, l.href) ? 'text-accent' : 'text-ink'}`}
               >
                 {l.label}
               </Link>
@@ -88,8 +92,9 @@ export function MobileMenu({
               {bookLabel}
             </Link>
           </nav>
-        </div>
-      )}
+        </div>,
+          document.body,
+        )}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Logo } from '@/components/logo';
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/auth';
 import { getSiteSettings } from '@/lib/data';
@@ -18,10 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div dir="ltr" lang="en" className="min-h-screen font-sans lg:grid lg:grid-cols-[240px_1fr]">
       <aside className="flex flex-col border-b border-line bg-surface p-5 lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-e">
         <div className="flex items-start justify-between">
-          <Link href="/admin">
-            <span className="block font-display text-2xl">{settings?.studio_name_en}</span>
-            <span className="eyebrow">Admin</span>
-          </Link>
+          <Logo name={settings?.studio_name_en ?? ''} href="/admin" subtitle={<span className="eyebrow">Admin</span>} />
           <ThemeToggle label="Toggle dark mode" />
         </div>
         <SideNav

@@ -49,7 +49,7 @@ const GROUPS: Array<{ title: string; fields: Field[][] }> = [
     title: 'Contact',
     fields: [
       [
-        { name: 'whatsapp_number', label: 'WhatsApp number', ltr: true, hint: 'With country code, e.g. 201001234567' },
+        { name: 'whatsapp_number', label: 'WhatsApp number', ltr: true, hint: 'e.g. 01001234567 — the Egypt code (20) is added automatically' },
         { name: 'instagram_url', label: 'Instagram link', ltr: true },
       ],
       [

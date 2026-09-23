@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from './logo';
 import { getDictionary } from '@/lib/i18n/server';
 import { getSiteSettings } from '@/lib/data';
 import { localized } from '@/lib/utils';
@@ -11,9 +12,7 @@ export async function MinimalHeader() {
   return (
     <header className="border-b border-line">
       <div className="container-x flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="font-display text-2xl">
-          {settings ? localized(settings, 'studio_name', locale) : ''}
-        </Link>
+        <Logo name={settings ? localized(settings, 'studio_name', locale) : ''} />
         <div className="flex items-center gap-4">
           <LocaleToggle locale={locale} />
           <ThemeToggle label={t.nav.toggleTheme} />

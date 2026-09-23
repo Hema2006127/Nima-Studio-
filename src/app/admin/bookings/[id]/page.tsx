@@ -34,7 +34,7 @@ export default async function AdminBookingDetailPage({ params }: PageProps<'/adm
   const paid = payments.reduce((s, p) => s + Number(p.amount), 0);
   const currency = quotation?.currency ?? 'EGP';
   const coverage = booking.booking_services.map((b) => b.services?.title_en).filter(Boolean).join(', ');
-  const wa = whatsappLink(booking.contact_phone.replace(/^0/, '20'), `Hello ${booking.contact_name}, regarding your booking #${booking.reference}`);
+  const wa = whatsappLink(booking.contact_phone, `Hello ${booking.contact_name}, regarding your booking #${booking.reference}`);
 
   return (
     <>

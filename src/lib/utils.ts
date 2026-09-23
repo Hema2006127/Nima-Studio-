@@ -43,10 +43,21 @@ export function safeNext(next: unknown, fallback = '/account'): string {
   return next;
 }
 
+/**
+ * Normalises a phone number to the international digits wa.me expects.
+ * Egyptian local numbers (01xxxxxxxxx) get the 20 country code; a leading 00 is dropped.
+ */
+export function toInternationalPhone(number: string): string {
+  let digits = number.replace(/\D/g, '');
+  if (digits.startsWith('00')) digits = digits.slice(2);
+  if (/^01\d{9}$/.test(digits)) digits = `2${digits}`;
+  return digits;
+}
+
 export function whatsappLink(number: string | null | undefined, text?: string): string | null {
   if (!number) return null;
-  const digits = number.replace(/\D/g, '');
-  if (!digits) return null;
+  const digits = toInternationalPhone(number);
+  if (digits.length < 8) return null;
   return `https://wa.me/${digits}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
 }
 

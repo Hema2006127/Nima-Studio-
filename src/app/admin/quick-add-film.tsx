@@ -52,7 +52,7 @@ export function QuickAddFilm() {
           <label className="label" htmlFor="qa-category">
             Category
           </label>
-          <select id="qa-category" name="category" defaultValue="wedding" className="input capitalize">
+          <select id="qa-category" name="category" defaultValue="promo" className="input capitalize">
             {PORTFOLIO_CATEGORIES.map((c) => (
               <option key={c} value={c}>
                 {c}

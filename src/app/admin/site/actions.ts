@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { assertAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { parseYouTubeId } from '@/lib/youtube';
-import { str } from '@/lib/utils';
+import { str, toInternationalPhone } from '@/lib/utils';
 import type { ActionState } from '@/lib/types';
 
 const text = (max: number) => z.string().max(max);
@@ -43,7 +43,7 @@ const schema = z.object({
   city_ar: text(80),
   phone: text(30),
   email: z.union([z.literal(''), z.email('Enter a valid email.')]),
-  whatsapp_number: z.union([z.literal(''), z.string().regex(/^[0-9]{8,15}$/, 'Digits only with country code, e.g. 201001234567.')]),
+  whatsapp_number: z.union([z.literal(''), z.string().regex(/^[0-9]{8,15}$/, 'Enter a valid WhatsApp number, e.g. 01001234567 or 201001234567.')]),
   instagram_url: z.union([z.literal(''), z.string().regex(/^https:\/\/www\.instagram\.com\/[A-Za-z0-9._/]+$/, 'Paste your Instagram profile link, e.g. https://instagram.com/yourstudio')]),
 });
 
@@ -52,7 +52,7 @@ export async function saveSiteSettings(_prev: ActionState, formData: FormData): 
   if (!auth.ok) return { error: auth.error };
 
   const raw = Object.fromEntries(Object.keys(schema.shape).map((k) => [k, str(formData, k)]));
-  raw.whatsapp_number = raw.whatsapp_number.replace(/[\s+\-()]/g, '');
+  raw.whatsapp_number = raw.whatsapp_number ? toInternationalPhone(raw.whatsapp_number) : '';
   raw.instagram_url = normalizeInstagramUrl(raw.instagram_url);
   const parsed = schema.safeParse(raw);
 
