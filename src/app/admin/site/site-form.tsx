@@ -33,7 +33,7 @@ const GROUPS: Array<{ title: string; fields: Field[][] }> = [
         { name: 'hero_subtitle_en', label: 'Subtitle (English)', textarea: true },
         { name: 'hero_subtitle_ar', label: 'Subtitle (Arabic)', textarea: true, rtl: true },
       ],
-      [{ name: 'showreel_url', label: 'Showreel video link — YouTube or Google Drive', ltr: true, hint: 'Shown in the hero as a vertical reel. Drive files must be shared as “Anyone with the link”. Leave empty to hide.' }],
+      [{ name: 'showreel_url', label: 'Showreel video link — YouTube or Google Drive', ltr: true, hint: 'Shown in the hero as a vertical reel. YouTube links autoplay muted on page load (use a vertical Short); Google Drive can’t autoplay and needs a tap. Leave empty to hide.' }],
     ],
   },
   {

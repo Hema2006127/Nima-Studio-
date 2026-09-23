@@ -41,10 +41,23 @@ export function parseYouTubeId(input: string): string | null {
   return isValidYouTubeId(candidate) ? candidate : null;
 }
 
-export function youTubeEmbedUrl(id: string, { autoplay = false } = {}): string {
+export function youTubeEmbedUrl(id: string, { autoplay = false, background = false } = {}): string {
   if (!isValidYouTubeId(id)) throw new Error('Invalid YouTube video ID');
   const params = new URLSearchParams({ rel: '0', modestbranding: '1', playsinline: '1' });
   if (autoplay) params.set('autoplay', '1');
+  if (background) {
+    // Muted, looping, chrome-less reel. Browsers only allow autoplay when muted;
+    // enablejsapi lets the page unmute it via postMessage.
+    params.set('autoplay', '1');
+    params.set('mute', '1');
+    params.set('loop', '1');
+    params.set('playlist', id);
+    params.set('controls', '0');
+    params.set('disablekb', '1');
+    params.set('iv_load_policy', '3');
+    params.set('fs', '0');
+    params.set('enablejsapi', '1');
+  }
   return `https://www.youtube-nocookie.com/embed/${id}?${params}`;
 }
 

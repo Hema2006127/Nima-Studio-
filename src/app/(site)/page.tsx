@@ -3,6 +3,7 @@ import { getDictionary } from '@/lib/i18n/server';
 import { getHomeFilms, getPublishedServices, getSiteSettings } from '@/lib/data';
 import { localized } from '@/lib/utils';
 import { VideoPlayer } from '@/components/video-player';
+import { AutoplayReel } from '@/components/autoplay-reel';
 import { ArrowIcon, PlayIcon } from '@/components/icons';
 import { ContactButtons, EmptyState, LoadError, PortfolioCard, SectionHeading, ServiceCard } from '@/components/sections';
 
@@ -39,7 +40,16 @@ export default async function HomePage() {
         </div>
         {/* Vertical 9:16 reel frame — best with a vertical video (YouTube Short / Drive) */}
         <div className="order-1 mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:order-2 lg:max-w-[340px]">
-          {settings?.showreel_video_id ? (
+          {settings?.showreel_video_id && settings.showreel_provider === 'youtube' ? (
+            <AutoplayReel
+              videoId={settings.showreel_video_id}
+              title={t.home.showreel}
+              aspect="aspect-[9/16]"
+              className="shadow-xl"
+              soundOnLabel={t.home.soundOn}
+              soundOffLabel={t.home.soundOff}
+            />
+          ) : settings?.showreel_video_id ? (
             <VideoPlayer
               provider={settings.showreel_provider}
               videoId={settings.showreel_video_id}
