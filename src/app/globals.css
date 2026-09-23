@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens (from the UI/UX PDF). Dark mode swaps the tokens, so components
+   never need dark: variants. Theme = cookie (data-theme) or system preference.
+   --------------------------------------------------------------------------- */
+:root {
+  --bg: #f5f0e8;
+  --surface: #ffffff;
+  --soft: #ede4d6;
+  --media: #e4d9c6;
+  --ink: #1f1a17;
+  --ink-soft: #62594f;
+  --line: #ddd2c1;
+  --accent: #9a7650;
+  --primary: #1f1a17;
+  --primary-fg: #f5f0e8;
+  --danger: #9b3b2e;
+  --success-bg: #dfe8d8;
+  --success-fg: #2f4a26;
+  --band: #1f1a17;
+  --band-fg: #f5f0e8;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f0d0c;
+    --surface: #161412;
+    --soft: #1f1c19;
+    --media: #2a2623;
+    --ink: #f1e9dd;
+    --ink-soft: #a79e92;
+    --line: #2e2a26;
+    --accent: #c9a97e;
+    --primary: #e6d6bf;
+    --primary-fg: #151210;
+    --danger: #e0806f;
+    --success-bg: #243322;
+    --success-fg: #b9d3ac;
+    --band: #e6d6bf;
+    --band-fg: #151210;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f0d0c;
+  --surface: #161412;
+  --soft: #1f1c19;
+  --media: #2a2623;
+  --ink: #f1e9dd;
+  --ink-soft: #a79e92;
+  --line: #2e2a26;
+  --accent: #c9a97e;
+  --primary: #e6d6bf;
+  --primary-fg: #151210;
+  --danger: #e0806f;
+  --success-bg: #243322;
+  --success-fg: #b9d3ac;
+  --band: #e6d6bf;
+  --band-fg: #151210;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-soft: var(--soft);
+  --color-media: var(--media);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
+  --color-danger: var(--danger);
+  --color-success-bg: var(--success-bg);
+  --color-success-fg: var(--success-fg);
+  --color-band: var(--band);
+  --color-band-fg: var(--band-fg);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
+}
+
+/* Fonts follow the nearest lang attribute (the admin area is always English). */
+:root,
+[lang="en"] {
+  --font-body: var(--font-jost), system-ui, sans-serif;
+  --font-heading: var(--font-cormorant), Georgia, serif;
+}
+
+[lang="ar"] {
+  --font-body: var(--font-plex-arabic), var(--font-jost), system-ui, sans-serif;
+  --font-heading: var(--font-aref), var(--font-plex-arabic), serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+@utility container-x {
+  @apply mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8;
+}
+
+@utility eyebrow {
+  @apply text-[11px] font-normal uppercase tracking-[0.2em] text-accent;
+}
+
+.eyebrow:lang(ar) {
+  @apply text-sm tracking-normal normal-case;
+}
+
+@utility display {
+  @apply font-display font-normal leading-[1.05] text-ink;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap px-5 py-3 text-sm font-medium transition-colors
+    disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2
+    focus-visible:outline-accent;
+}
+
+@utility btn-primary {
+  @apply btn bg-primary text-primary-fg hover:opacity-90;
+}
+
+@utility btn-outline {
+  @apply btn border border-ink/70 text-ink hover:bg-ink/5;
+}
+
+@utility btn-ghost {
+  @apply btn px-3 text-ink-soft hover:text-ink;
+}
+
+@utility btn-danger {
+  @apply btn text-danger hover:underline;
+}
+
+@utility btn-sm {
+  @apply !px-3 !py-2 !text-xs;
+}
+
+@utility label {
+  @apply mb-1.5 block text-sm font-medium text-ink;
+}
+
+@utility input {
+  @apply block w-full border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60
+    focus:border-ink/60 focus:outline-none;
+}
+
+@utility card {
+  @apply border border-line bg-surface;
+}
+
+@utility link {
+  @apply underline underline-offset-4 hover:text-accent;
+}
+
+@utility field-error {
+  @apply mt-1 text-xs text-danger;
+}
+
+/* Mirror directional icons in RTL */
+[dir="rtl"] .flip-rtl {
+  transform: scaleX(-1);
+}
