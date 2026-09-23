@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test tests/youtube.test.mts && node tests/rls.test.mjs",
+    "test": "node --test tests/youtube.test.mts tests/video.test.mts && node tests/rls.test.mjs",
     "test:db": "node tests/rls.test.mjs",
     "typecheck": "tsc --noEmit"
   },

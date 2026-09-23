@@ -85,20 +85,25 @@ async function rows(role, uid, sql, params = []) {
 ok((await rows('authenticated', CUST, `select full_name from profiles`))[0]?.full_name === 'Cust One', 'profile auto-created from signup metadata');
 
 // Portfolio visibility
-await db.exec(`insert into portfolio_items (title, youtube_video_id, is_published) values ('Pub', 'dQw4w9WgXcQ', true), ('Draft', 'aaaaaaaaaaa', false)`);
+await db.exec(`insert into portfolio_items (title, video_id, is_published) values ('Pub', 'dQw4w9WgXcQ', true), ('Draft', 'aaaaaaaaaaa', false)`);
 ok((await rows('anon', null, `select title from portfolio_items`)).length === 1, 'anon sees only published portfolio items');
 ok((await rows('authenticated', CUST, `select title from portfolio_items`)).length === 1, 'customer sees only published portfolio items');
 ok((await rows('authenticated', ADMIN, `select title from portfolio_items`)).length === 2, 'admin sees unpublished items (preview)');
-ok(await fails('authenticated', ADMIN, `insert into portfolio_items (title, youtube_video_id) values ('bad', '<iframe>')`), 'invalid youtube id rejected by constraint');
+ok(await fails('authenticated', ADMIN, `insert into portfolio_items (title, video_id) values ('bad', '<iframe>')`), 'invalid youtube id rejected by constraint');
+ok((await rows('authenticated', ADMIN, `insert into portfolio_items (title, video_provider, video_id) values ('drive', 'drive', '1rt8cwM9GuXrO1kujviEaT-AYhyOCWXbt') returning id`)).length === 1, 'drive video accepted');
+ok(await fails('authenticated', ADMIN, `insert into portfolio_items (title, video_provider, video_id) values ('bad', 'drive', 'dQw4w9WgXcQ')`), 'youtube-length id rejected for drive provider');
+ok(await fails('authenticated', ADMIN, `insert into portfolio_items (title, video_provider, video_id) values ('bad', 'vimeo', 'abcdefghijk')`), 'unknown provider rejected');
+ok(await fails('authenticated', ADMIN, `update site_settings set showreel_provider = 'drive', showreel_video_id = 'short'`), 'invalid drive showreel rejected');
+await rows('authenticated', ADMIN, `delete from portfolio_items where title = 'drive'`);
 ok((await rows('authenticated', ADMIN, `select published_at from portfolio_items where title='Pub'`))[0].published_at !== null, 'published_at set on publish');
 
-const custInsert = await rows('authenticated', CUST, `insert into portfolio_items (title, youtube_video_id) values ('x','bbbbbbbbbbb') returning id`).catch(() => null);
+const custInsert = await rows('authenticated', CUST, `insert into portfolio_items (title, video_id) values ('x','bbbbbbbbbbb') returning id`).catch(() => null);
 ok(custInsert === null, 'customer cannot insert portfolio items');
 await rows('authenticated', CUST, `update portfolio_items set title='hacked'`);
 await rows('anon', null, `delete from portfolio_items`).catch(() => {});
 ok((await rows('authenticated', ADMIN, `select count(*)::int n from portfolio_items where title='hacked'`))[0].n === 0, 'customer update of portfolio has no effect');
 ok((await rows('authenticated', ADMIN, `select count(*)::int n from portfolio_items`))[0].n === 2, 'anon delete of portfolio has no effect');
-ok((await rows('authenticated', ADMIN, `insert into portfolio_items (title, youtube_video_id) values ('A','ccccccccccc') returning id`)).length === 1, 'admin can insert portfolio items');
+ok((await rows('authenticated', ADMIN, `insert into portfolio_items (title, video_id) values ('A','ccccccccccc') returning id`)).length === 1, 'admin can insert portfolio items');
 
 // Admin escalation attempts
 ok(await fails('authenticated', CUST, `insert into admins (user_id) values ('${CUST}')`), 'customer cannot add themselves to admins');

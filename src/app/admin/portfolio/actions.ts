@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { assertAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { validateImage } from '@/lib/images';
-import { parseYouTubeId } from '@/lib/youtube';
+import { parseVideoUrl } from '@/lib/video';
 import { str } from '@/lib/utils';
 import { PORTFOLIO_CATEGORIES, type ActionState } from '@/lib/types';
 
@@ -50,8 +50,8 @@ async function removeCover(path: string | null | undefined) {
 }
 
 function parseForm(formData: FormData) {
-  const youtubeInput = str(formData, 'youtube_url');
-  const videoId = parseYouTubeId(youtubeInput);
+  const videoInput = str(formData, 'video_url');
+  const video = parseVideoUrl(videoInput);
   const parsed = schema.safeParse({
     title: str(formData, 'title'),
     title_ar: str(formData, 'title_ar'),
@@ -66,15 +66,15 @@ function parseForm(formData: FormData) {
   });
 
   const fieldErrors: Record<string, string> = {};
-  if (!youtubeInput) fieldErrors.youtube_url = 'Paste a YouTube link.';
-  else if (!videoId) fieldErrors.youtube_url = 'This is not a valid YouTube video link.';
+  if (!videoInput) fieldErrors.video_url = 'Paste a YouTube or Google Drive link.';
+  else if (!video) fieldErrors.video_url = 'This is not a valid YouTube or Google Drive video link.';
   if (!parsed.success) {
     for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] ??= issue.message;
   }
-  if (!parsed.success || !videoId) return { fieldErrors } as const;
+  if (!parsed.success || !video) return { fieldErrors } as const;
 
   const { event_date, ...rest } = parsed.data;
-  return { values: { ...rest, event_date: event_date || null, youtube_video_id: videoId } } as const;
+  return { values: { ...rest, event_date: event_date || null, video_provider: video.provider, video_id: video.id } } as const;
 }
 
 function coverFile(formData: FormData): File | null {

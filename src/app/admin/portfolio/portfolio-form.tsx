@@ -4,7 +4,7 @@ import { useActionState, useState } from 'react';
 import { createPortfolioItem, updatePortfolioItem } from './actions';
 import { FieldError, FormMessage, SubmitButton } from '@/components/form';
 import { VideoPlayer } from '@/components/video-player';
-import { parseYouTubeId, youTubeWatchUrl } from '@/lib/youtube';
+import { parseVideoUrl, videoWatchUrl } from '@/lib/video';
 import { PORTFOLIO_CATEGORIES, type PortfolioItem } from '@/lib/types';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -14,9 +14,9 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function PortfolioForm({ item, coverUrl }: { item?: PortfolioItem; coverUrl?: string | null }) {
   const [state, action] = useActionState(item ? updatePortfolioItem : createPortfolioItem, null);
-  const [url, setUrl] = useState(item ? youTubeWatchUrl(item.youtube_video_id) : '');
+  const [url, setUrl] = useState(item ? videoWatchUrl({ provider: item.video_provider, id: item.video_id }) : '');
   const [preview, setPreview] = useState<string | null>(null);
-  const videoId = parseYouTubeId(url);
+  const video = parseVideoUrl(url);
 
   return (
     <form action={action} className="grid gap-8 xl:grid-cols-[1fr_380px]" noValidate>
@@ -26,24 +26,28 @@ export function PortfolioForm({ item, coverUrl }: { item?: PortfolioItem; coverU
         <FormMessage state={state} />
 
         <div>
-          <label htmlFor="youtube_url" className="label">
-            YouTube link
+          <label htmlFor="video_url" className="label">
+            Video link — YouTube or Google Drive
           </label>
           <input
-            id="youtube_url"
-            name="youtube_url"
+            id="video_url"
+            name="video_url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://youtube.com/watch?v=… or https://youtu.be/…"
+            placeholder="https://youtu.be/… or https://drive.google.com/file/d/…"
             className="input"
             required
           />
-          {url && !videoId ? (
-            <p className="field-error">Not a valid YouTube video link.</p>
+          {url && !video ? (
+            <p className="field-error">Not a valid YouTube or Google Drive video link.</p>
+          ) : video?.provider === 'drive' ? (
+            <p className="mt-1 text-xs text-ink-soft">
+              Google Drive: set sharing to <strong>Anyone with the link → Viewer</strong>, otherwise visitors can’t play it.
+            </p>
           ) : (
-            <p className="mt-1 text-xs text-ink-soft">We store only the video ID and build a privacy-friendly embed from it.</p>
+            <p className="mt-1 text-xs text-ink-soft">We store only the video ID and build a safe embed from it.</p>
           )}
-          <FieldError state={state} name="youtube_url" />
+          <FieldError state={state} name="video_url" />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
@@ -108,7 +112,7 @@ export function PortfolioForm({ item, coverUrl }: { item?: PortfolioItem; coverU
 
         <div>
           <label htmlFor="cover" className="label">
-            Cover image <span className="font-normal text-ink-soft">(optional — defaults to the YouTube thumbnail)</span>
+            Cover image <span className="font-normal text-ink-soft">(optional — defaults to the video’s thumbnail)</span>
           </label>
           <input
             id="cover"
@@ -121,7 +125,7 @@ export function PortfolioForm({ item, coverUrl }: { item?: PortfolioItem; coverU
               setPreview(f ? URL.createObjectURL(f) : null);
             }}
           />
-          <p className="mt-1 text-xs text-ink-soft">JPG, PNG, WebP or AVIF · max 4 MB. Videos are never uploaded here — they live on YouTube.</p>
+          <p className="mt-1 text-xs text-ink-soft">JPG, PNG, WebP or AVIF · max 4 MB. Videos are never uploaded here — they live on YouTube or Google Drive.</p>
           <FieldError state={state} name="cover" />
           {item?.cover_image_path && (
             <label className="mt-2 flex items-center gap-2 text-sm">
@@ -151,10 +155,16 @@ export function PortfolioForm({ item, coverUrl }: { item?: PortfolioItem; coverU
 
       <aside className="space-y-3">
         <p className="text-sm font-medium">Preview</p>
-        {videoId ? (
-          <VideoPlayer key={`${videoId}-${preview ?? coverUrl ?? ''}`} videoId={videoId} title="Preview" coverUrl={preview ?? coverUrl} />
+        {video ? (
+          <VideoPlayer
+            key={`${video.id}-${preview ?? coverUrl ?? ''}`}
+            provider={video.provider}
+            videoId={video.id}
+            title="Preview"
+            coverUrl={preview ?? coverUrl}
+          />
         ) : (
-          <div className="flex aspect-video items-center justify-center bg-media text-xs text-ink-soft">Paste a YouTube link to preview</div>
+          <div className="flex aspect-video items-center justify-center bg-media text-xs text-ink-soft">Paste a video link to preview</div>
         )}
         <p className="text-xs text-ink-soft">
           Unpublished items are visible only to admins. Publish when you’re happy with the preview.

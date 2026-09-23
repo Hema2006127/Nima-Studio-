@@ -1,3 +1,5 @@
+import type { VideoProvider } from './video';
+
 // Row types mirroring supabase/migrations. Regenerate with
 // `npx supabase gen types typescript` once the project is linked if you prefer generated types.
 
@@ -28,7 +30,8 @@ export interface SiteSettings {
   hero_subtitle_ar: string;
   about_en: string;
   about_ar: string;
-  showreel_youtube_id: string | null;
+  showreel_video_id: string | null;
+  showreel_provider: VideoProvider;
   whatsapp_number: string | null;
   instagram_url: string | null;
   phone: string | null;
@@ -59,7 +62,8 @@ export interface PortfolioItem {
   title_ar: string;
   description: string;
   description_ar: string;
-  youtube_video_id: string;
+  video_id: string;
+  video_provider: VideoProvider;
   cover_image_path: string | null;
   category: PortfolioCategory;
   venue: string;

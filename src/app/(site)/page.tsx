@@ -37,11 +37,12 @@ export default async function HomePage() {
             </div>
           )}
         </div>
-        {/* Vertical 9:16 reel frame — best with a YouTube Short as the showreel */}
+        {/* Vertical 9:16 reel frame — best with a vertical video (YouTube Short / Drive) */}
         <div className="order-1 mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:order-2 lg:max-w-[340px]">
-          {settings?.showreel_youtube_id ? (
+          {settings?.showreel_video_id ? (
             <VideoPlayer
-              videoId={settings.showreel_youtube_id}
+              provider={settings.showreel_provider}
+              videoId={settings.showreel_video_id}
               title={t.home.showreel}
               size="lg"
               playLabel={t.common.play}

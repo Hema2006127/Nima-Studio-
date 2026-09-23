@@ -3,7 +3,7 @@
 import { useActionState, useState } from 'react';
 import { createPortfolioItem } from './portfolio/actions';
 import { FieldError, FormMessage, SubmitButton } from '@/components/form';
-import { parseYouTubeId } from '@/lib/youtube';
+import { parseVideoUrl } from '@/lib/video';
 import { PORTFOLIO_CATEGORIES, type ActionState } from '@/lib/types';
 
 export function QuickAddFilm() {
@@ -13,33 +13,33 @@ export function QuickAddFilm() {
     if (result?.ok) setUrl('');
     return result;
   }, null);
-  const invalid = url.length > 0 && !parseYouTubeId(url);
+  const invalid = url.length > 0 && !parseVideoUrl(url);
 
   return (
     <section className="card self-start p-6">
-      <h2 className="text-lg font-medium">Quick add: YouTube film</h2>
+      <h2 className="text-lg font-medium">Quick add: film</h2>
       <form action={action} className="mt-4 space-y-4" noValidate>
         <input type="hidden" name="stay" value="1" />
         <input type="hidden" name="sort_order" value="0" />
         <FormMessage state={state} />
         <div>
           <label className="label" htmlFor="qa-url">
-            YouTube link
+            YouTube or Google Drive link
           </label>
           <input
             id="qa-url"
-            name="youtube_url"
+            name="video_url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://youtube.com/watch?v=…"
+            placeholder="https://youtu.be/… or drive.google.com/…"
             className="input"
           />
           {invalid ? (
-            <p className="field-error">Not a valid YouTube video link.</p>
+            <p className="field-error">Not a valid YouTube or Google Drive link.</p>
           ) : (
             <p className="mt-1 text-xs text-ink-soft">We save only the video ID and build the embed safely.</p>
           )}
-          <FieldError state={state} name="youtube_url" />
+          <FieldError state={state} name="video_url" />
         </div>
         <div>
           <label className="label" htmlFor="qa-title">

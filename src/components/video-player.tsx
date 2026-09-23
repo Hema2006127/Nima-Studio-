@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { PlayIcon } from './icons';
-import { isValidYouTubeId, youTubeEmbedUrl, youTubeThumbnailUrl } from '@/lib/youtube';
+import { isValidVideo, videoEmbedUrl, videoThumbnailUrl, type VideoProvider } from '@/lib/video';
 
 interface Props {
+  provider?: VideoProvider;
   videoId: string;
   title: string;
   coverUrl?: string | null;
@@ -17,22 +18,30 @@ interface Props {
 }
 
 /**
- * Click-to-play YouTube embed. Shows the cover (or YouTube thumbnail) first and
- * only loads the privacy-enhanced youtube-nocookie iframe after a click.
+ * Click-to-play video (YouTube or Google Drive). Shows the cover or the provider's
+ * thumbnail first and only loads the iframe (youtube-nocookie / Drive preview) after a click.
  */
-export function VideoPlayer({ videoId, title, coverUrl, label, playLabel = 'Play video', className = '', size = 'sm', badge, aspect = 'aspect-video' }: Props) {
+export function VideoPlayer({ provider = 'youtube', videoId, title, coverUrl, label, playLabel = 'Play video', className = '', size = 'sm', badge, aspect = 'aspect-video' }: Props) {
   const [playing, setPlaying] = useState(false);
-  const valid = isValidYouTubeId(videoId);
-  // Large players use the HD thumbnail (no letterbox bars); fall back if a video has none.
-  const [hdFailed, setHdFailed] = useState(false);
-  const poster = coverUrl ?? (valid ? youTubeThumbnailUrl(videoId, size === 'lg' && !hdFailed ? 'maxresdefault' : 'hqdefault') : null);
+  const valid = isValidVideo(provider, videoId);
+  const video = { provider, id: videoId };
+  // Thumbnail fallbacks: HD → standard → none (e.g. a Drive file that isn't public).
+  const [thumbFailures, setThumbFailures] = useState(0);
+  const poster =
+    coverUrl ??
+    (valid && thumbFailures < 2 ? videoThumbnailUrl(video, { large: size === 'lg' && thumbFailures === 0 }) : null);
 
-  if (playing && valid) {
+  // Drive doesn't serve thumbnails to other sites and can't autoplay, so without a
+  // custom cover we show Drive's own player (poster + play button) right away.
+  const driveInline = provider === 'drive' && !coverUrl;
+
+  if (valid && (playing || driveInline)) {
     return (
       <div className={`relative w-full overflow-hidden bg-black ${aspect} ${className}`}>
         <iframe
-          src={youTubeEmbedUrl(videoId, { autoplay: true })}
+          src={videoEmbedUrl(video, { autoplay: true })}
           title={title}
+          loading={driveInline ? 'lazy' : undefined}
           className="absolute inset-0 h-full w-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
@@ -56,7 +65,7 @@ export function VideoPlayer({ videoId, title, coverUrl, label, playLabel = 'Play
           src={poster}
           alt=""
           loading="lazy"
-          onError={() => setHdFailed(true)}
+          onError={() => setThumbFailures((n) => n + 1)}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
         />
       )}

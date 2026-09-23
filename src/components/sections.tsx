@@ -36,7 +36,8 @@ export function PortfolioCard({
   return (
     <article>
       <VideoPlayer
-        videoId={item.youtube_video_id}
+        provider={item.video_provider}
+        videoId={item.video_id}
         title={title}
         coverUrl={storagePublicUrl(item.cover_image_path)}
         playLabel={t.common.play}

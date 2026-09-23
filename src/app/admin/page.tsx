@@ -38,7 +38,7 @@ export default async function AdminOverviewPage() {
         actions={
           <>
             <Link href="/admin/portfolio/new" className="btn-outline">
-              Add YouTube film
+              Add film
             </Link>
             <Link href="/admin/bookings?status=pending" className="btn-primary">
               Pending bookings

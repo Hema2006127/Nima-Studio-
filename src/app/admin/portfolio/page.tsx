@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { storagePublicUrl } from '@/lib/supabase/env';
-import { youTubeThumbnailUrl } from '@/lib/youtube';
+import { videoThumbnailUrl } from '@/lib/video';
 import { StatusBadge } from '@/components/status-badge';
 import { Empty, Notice, PageHeader, Table } from '../ui';
 import { movePortfolioItem, setPortfolioPublished } from './actions';
@@ -23,10 +23,10 @@ export default async function AdminPortfolioPage({ searchParams }: PageProps<'/a
     <>
       <PageHeader
         title="Portfolio"
-        description="YouTube films and reels shown on the website. Upload videos to YouTube first, then add the link here."
+        description="Films and reels shown on the website. Upload the video to YouTube or Google Drive first, then add the link here."
         actions={
           <Link href="/admin/portfolio/new" className="btn-primary">
-            Add YouTube film
+            Add film
           </Link>
         }
       />
@@ -38,7 +38,7 @@ export default async function AdminPortfolioPage({ searchParams }: PageProps<'/a
         <Empty>
           No films yet.{' '}
           <Link href="/admin/portfolio/new" className="link">
-            Add your first YouTube film
+            Add your first film
           </Link>
           .
         </Empty>
@@ -49,7 +49,7 @@ export default async function AdminPortfolioPage({ searchParams }: PageProps<'/a
               <td className="w-28 px-5 py-3">
                 {/* eslint-disable-next-line @next/next/no-img-element -- remote thumbnail */}
                 <img
-                  src={storagePublicUrl(item.cover_image_path) ?? youTubeThumbnailUrl(item.youtube_video_id)}
+                  src={storagePublicUrl(item.cover_image_path) ?? videoThumbnailUrl({ provider: item.video_provider, id: item.video_id })}
                   alt=""
                   className="aspect-video w-24 object-cover"
                   loading="lazy"

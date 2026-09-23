@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { assertAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { parseYouTubeId } from '@/lib/youtube';
+import { parseVideoUrl } from '@/lib/video';
 import { str, toInternationalPhone } from '@/lib/utils';
 import type { ActionState } from '@/lib/types';
 
@@ -58,8 +58,8 @@ export async function saveSiteSettings(_prev: ActionState, formData: FormData): 
 
   const fieldErrors: Record<string, string> = {};
   const showreelInput = str(formData, 'showreel_url');
-  const showreelId = showreelInput ? parseYouTubeId(showreelInput) : null;
-  if (showreelInput && !showreelId) fieldErrors.showreel_url = 'This is not a valid YouTube video link.';
+  const showreel = showreelInput ? parseVideoUrl(showreelInput) : null;
+  if (showreelInput && !showreel) fieldErrors.showreel_url = 'This is not a valid YouTube or Google Drive video link.';
   if (!parsed.success) for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] ??= issue.message;
   if (!parsed.success || Object.keys(fieldErrors).length) return { fieldErrors, error: 'Please fix the highlighted fields.' };
 
@@ -73,7 +73,8 @@ export async function saveSiteSettings(_prev: ActionState, formData: FormData): 
       email: nullable(parsed.data.email),
       whatsapp_number: nullable(parsed.data.whatsapp_number),
       instagram_url: nullable(parsed.data.instagram_url),
-      showreel_youtube_id: showreelId,
+      showreel_video_id: showreel?.id ?? null,
+      showreel_provider: showreel?.provider ?? 'youtube',
     })
     .eq('id', 1);
   if (error) return { error: `Could not save: ${error.message}` };

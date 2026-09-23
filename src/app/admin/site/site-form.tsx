@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import { saveSiteSettings } from './actions';
 import { FieldError, FormMessage, SubmitButton } from '@/components/form';
-import { youTubeWatchUrl } from '@/lib/youtube';
+import { videoWatchUrl } from '@/lib/video';
 import type { ActionState, SiteSettings } from '@/lib/types';
 
 type Field = { name: keyof SiteSettings | 'showreel_url'; label: string; textarea?: boolean; rtl?: boolean; ltr?: boolean; hint?: string };
@@ -33,7 +33,7 @@ const GROUPS: Array<{ title: string; fields: Field[][] }> = [
         { name: 'hero_subtitle_en', label: 'Subtitle (English)', textarea: true },
         { name: 'hero_subtitle_ar', label: 'Subtitle (Arabic)', textarea: true, rtl: true },
       ],
-      [{ name: 'showreel_url', label: 'Showreel YouTube link', ltr: true, hint: 'Shown in the hero. Leave empty to hide.' }],
+      [{ name: 'showreel_url', label: 'Showreel video link — YouTube or Google Drive', ltr: true, hint: 'Shown in the hero as a vertical reel. Drive files must be shared as “Anyone with the link”. Leave empty to hide.' }],
     ],
   },
   {
@@ -67,7 +67,7 @@ const GROUPS: Array<{ title: string; fields: Field[][] }> = [
 export function SiteForm({ settings }: { settings: SiteSettings }) {
   const [state, action] = useActionState(saveSiteSettings, null);
   const value = (name: Field['name']) =>
-    name === 'showreel_url' ? (settings.showreel_youtube_id ? youTubeWatchUrl(settings.showreel_youtube_id) : '') : String(settings[name] ?? '');
+    name === 'showreel_url' ? (settings.showreel_video_id ? videoWatchUrl({ provider: settings.showreel_provider, id: settings.showreel_video_id }) : '') : String(settings[name] ?? '');
 
   return (
     <form action={action} className="max-w-4xl space-y-6" noValidate>

@@ -8,7 +8,7 @@ export default async function NewPortfolioItemPage() {
   return (
     <>
       <PageHeader
-        title="Add YouTube film"
+        title="Add film"
         actions={
           <Link href="/admin/portfolio" className="btn-ghost">
             ← Back to portfolio
