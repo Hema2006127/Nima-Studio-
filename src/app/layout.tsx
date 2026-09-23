@@ -3,6 +3,8 @@ import { Aref_Ruqaa, Cormorant_Garamond, IBM_Plex_Sans_Arabic, Jost } from 'next
 import { getLocale, getTheme } from '@/lib/i18n/server';
 import { getSiteSettings } from '@/lib/data';
 import { localized } from '@/lib/utils';
+import { siteUrl } from '@/lib/site-url';
+import { youTubeThumbnailUrl } from '@/lib/youtube';
 import './globals.css';
 
 const cormorant = Cormorant_Garamond({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-cormorant' });
@@ -14,9 +16,23 @@ export async function generateMetadata(): Promise<Metadata> {
   const [settings, locale] = await Promise.all([getSiteSettings(), getLocale()]);
   const name = settings ? localized(settings, 'studio_name', locale) : 'Wedding Studio';
   const tagline = settings ? localized(settings, 'tagline', locale) : '';
+  const title = tagline ? `${name} — ${tagline}` : name;
+  const description = settings ? localized(settings, 'hero_subtitle', locale) : undefined;
+  // Link previews (WhatsApp, Instagram, Facebook) use the showreel thumbnail.
+  const image = settings?.showreel_youtube_id ? youTubeThumbnailUrl(settings.showreel_youtube_id, 'hqdefault') : undefined;
   return {
-    title: { default: tagline ? `${name} — ${tagline}` : name, template: `%s · ${name}` },
-    description: settings ? localized(settings, 'hero_subtitle', locale) : undefined,
+    metadataBase: new URL(siteUrl()),
+    title: { default: title, template: `%s · ${name}` },
+    description,
+    openGraph: {
+      type: 'website',
+      siteName: name,
+      title,
+      description,
+      locale: locale === 'ar' ? 'ar_EG' : 'en_US',
+      images: image ? [{ url: image }] : undefined,
+    },
+    twitter: { card: 'summary_large_image', title, description, images: image ? [image] : undefined },
   };
 }
 

@@ -37,17 +37,19 @@ export default async function HomePage() {
             </div>
           )}
         </div>
-        <div className="order-1 lg:order-2">
+        {/* Vertical 9:16 reel frame — best with a YouTube Short as the showreel */}
+        <div className="order-1 mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:order-2 lg:max-w-[340px]">
           {settings?.showreel_youtube_id ? (
             <VideoPlayer
               videoId={settings.showreel_youtube_id}
               title={t.home.showreel}
               size="lg"
               playLabel={t.common.play}
-              aspect="aspect-video lg:aspect-[4/3.4]"
+              aspect="aspect-[9/16]"
+              className="shadow-xl"
             />
           ) : (
-            <div className="aspect-video bg-media lg:aspect-[4/3.4]" />
+            <div className="aspect-[9/16] bg-media" />
           )}
         </div>
       </section>

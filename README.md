@@ -32,6 +32,10 @@ Next.js 16 (App Router) + Supabase (Postgres, Auth, Storage). Bilingual (English
    npm run dev
    ```
 
+## Deploying
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) (Vercel + custom domain + Supabase auth/SMTP settings).
+
 ## Adding a film
 
 Upload the video to YouTube, then go to **/admin/portfolio → Add YouTube film**, paste the link, and tick *Published*. Only the 11-character video ID is stored; the site embeds it with `youtube-nocookie.com`.

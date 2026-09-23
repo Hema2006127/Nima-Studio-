@@ -10,6 +10,24 @@ import type { ActionState } from '@/lib/types';
 
 const text = (max: number) => z.string().max(max);
 
+/**
+ * Accepts any Instagram profile link as copied from the app (with or without
+ * https/www, share/tracking parameters) and returns a clean canonical URL.
+ * Returns the input unchanged when it isn't an Instagram link so validation reports it.
+ */
+function normalizeInstagramUrl(input: string): string {
+  if (!input) return '';
+  try {
+    const url = new URL(/^https?:\/\//i.test(input) ? input : `https://${input}`);
+    const host = url.hostname.toLowerCase().replace(/^(www|m)\./, '');
+    if (host !== 'instagram.com') return input;
+    const path = url.pathname.replace(/\/+$/, '');
+    return path ? `https://www.instagram.com${path}` : input;
+  } catch {
+    return input;
+  }
+}
+
 const schema = z.object({
   studio_name_en: z.string().min(1, 'Required.').max(80),
   studio_name_ar: z.string().min(1, 'Required.').max(80),
@@ -26,7 +44,7 @@ const schema = z.object({
   phone: text(30),
   email: z.union([z.literal(''), z.email('Enter a valid email.')]),
   whatsapp_number: z.union([z.literal(''), z.string().regex(/^[0-9]{8,15}$/, 'Digits only with country code, e.g. 201001234567.')]),
-  instagram_url: z.union([z.literal(''), z.string().regex(/^https:\/\/(www\.)?instagram\.com\/[A-Za-z0-9._\-/]*$/, 'Use a full link like https://instagram.com/yourstudio')]),
+  instagram_url: z.union([z.literal(''), z.string().regex(/^https:\/\/www\.instagram\.com\/[A-Za-z0-9._/]+$/, 'Paste your Instagram profile link, e.g. https://instagram.com/yourstudio')]),
 });
 
 export async function saveSiteSettings(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -35,6 +53,7 @@ export async function saveSiteSettings(_prev: ActionState, formData: FormData): 
 
   const raw = Object.fromEntries(Object.keys(schema.shape).map((k) => [k, str(formData, k)]));
   raw.whatsapp_number = raw.whatsapp_number.replace(/[\s+\-()]/g, '');
+  raw.instagram_url = normalizeInstagramUrl(raw.instagram_url);
   const parsed = schema.safeParse(raw);
 
   const fieldErrors: Record<string, string> = {};
